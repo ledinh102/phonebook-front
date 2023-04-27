@@ -7,7 +7,7 @@ import servicePersons from "./services/persons"
 
 export default function App() {
 	const [persons, setPersons] = useState([])
-	const [person, setPerson] = useState({ name: "", phone: "", id: 0 })
+	const [person, setPerson] = useState({ name: "", phone: "" })
 	const [textFilter, setTextFilter] = useState("")
 	const [notify, setNotify] = useState("Thanks")
 
@@ -27,72 +27,32 @@ export default function App() {
 		setTextFilter(value)
 	}
 
-	const onSubmit = (e) => {
+
+
+	const onSubmit = async (e) => {
 		e.preventDefault()
-		const newPerson = person
-		const indexPersonExist = persons.findIndex(
-			(person) => person.name === newPerson.name
-		)
-		console.log(indexPersonExist)
-		if (indexPersonExist !== -1) {
-			if (
-				window.confirm(
-					`${newPerson.name} is already added to phonebook, replace the old phone with a new one`
-				)
-			) {
-				servicePersons
-					.update(indexPersonExist + 1, person)
-					.then((returnedPerson) => {
-						setPersons((prevPersons) =>
-							prevPersons.map((person) =>
-								returnedPerson.name === person.name
-									? returnedPerson
-									: person
-							)
-						)
-					})
-					.catch((error) => {
-						setNotify(`Information of ${newPerson.name} has already been removed from server`)
-						setTimeout(() => {
-							setNotify("Thanks")
-						}, 5000)
-					})
-			} else {
-				servicePersons.create(person).then((returnedPerson) => {
-					setPersons([...persons, returnedPerson])
-				})
-			}
-		} else {
-			servicePersons.create(person).then((returnedPerson) => {
-				setPersons([...persons, returnedPerson])
-			})
-		}
-		setPerson({ name: "", phone: "", id: 0 })
-		setNotify(`Added ${newPerson.name}`)
-		setTimeout(() => {
-			setNotify("Thanks")
-		}, 5000)
+		// await addPerson(person)
+		const returnedPerson = await servicePersons.create(person)
+		setPersons([...persons, returnedPerson])
+		console.log(persons)
 	}
 
 	const handleDelete = (id) => {
-		const [personDelete] = persons.filter((person) => person.id === id)
-		console.log(personDelete)
-		if (window.confirm(`Delete ${personDelete.name} ?`)) {
-			servicePersons.deletePerson(id).then(() => {
-				setPersons((prevPersons) =>
-					prevPersons.filter((person) => person.id !== id)
-				)
-			})
-		}
+		const [personDelete] = persons.filter((person) => person._id === id)
+		// if (window.confirm(`Delete ${personDelete.name} ?`)) {
+		servicePersons.deletePerson(id).then(() => {
+			setPersons((prevPersons) =>
+				prevPersons.filter((person) => person._id !== id)
+			)
+		})
+		// }
 	}
 
 	const filterPersons =
-		textFilter === null
+		textFilter === ""
 			? persons
 			: persons.filter((person) =>
-					person.name
-						.toLocaleLowerCase()
-						.includes(textFilter.toLocaleLowerCase())
+					person.name.toLowerCase().includes(textFilter.toLowerCase())
 			  )
 
 	return (
@@ -128,4 +88,53 @@ export default function App() {
 			<Persons persons={filterPersons} onDelete={handleDelete} />
 		</div>
 	)
+}
+
+
+const addPerson = async (newPerson) => {
+	const indexPersonExist = persons.findIndex(
+		(person) => person.name === newPerson.name
+	)
+	console.log(indexPersonExist)
+	if (indexPersonExist !== -1) {
+		if (
+			window.confirm(
+				`${newPerson.name} is already added to phonebook, replace the old phone with a new one`
+			)
+		) {
+			servicePersons
+				.update(indexPersonExist + 1, person)
+				.then((returnedPerson) => {
+					setPersons((prevPersons) =>
+						prevPersons.map((person) =>
+							returnedPerson.name === person.name
+								? returnedPerson
+								: person
+						)
+					)
+				})
+				.catch((error) => {
+					setNotify(
+						`Information of ${newPerson.name} has already been removed from server`
+					)
+					setTimeout(() => {
+						setNotify("Thanks")
+					}, 5000)
+				})
+		} else {
+			servicePersons.create(person).then((returnedPerson) => {
+				setPersons([...persons, returnedPerson])
+			})
+		}
+	} else {
+		console.log(newPerson)
+		const returnedPerson = await servicePersons.create(newPerson)
+		console.log(returnedPerson)
+		setPersons([...persons, returnedPerson])
+	}
+	setNotify(`Added ${newPerson.name}`)
+	setPerson({ name: "", phone: "" })
+	setTimeout(() => {
+		setNotify("Thanks")
+	}, 5000)
 }

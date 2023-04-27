@@ -4,8 +4,8 @@ export default function Persons({ persons, onDelete }) {
 		<>
 			{persons.map((person) => (
 				<Person
-					key={person.id}
-					id={person.id}
+					key={person._id}
+					_id={person._id}
 					name={person.name}
 					phone={person.phone}
 					onDelete={onDelete}
