@@ -7,7 +7,9 @@ const getAll = () => {
 }
 
 const create = (newPerson) => {
-	return axios.post(baseUrl, newPerson).then((res) => res.data.pop())
+	return axios.post(baseUrl, newPerson).then((res) => {
+		return res.data.pop()
+	})
 }
 
 const update = (id, newPerson) => {
