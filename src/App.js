@@ -27,6 +27,18 @@ export default function App() {
 		setTextFilter(value)
 	}
 
+	const showNotify = (messageError = "") => {
+		if (messageError === "") {
+			setNotify(`Added ${person.name}`)
+		} else {
+			setNotify(`${messageError}`)
+		}
+		setPerson({ name: "", phone: "" })
+		setTimeout(() => {
+			setNotify("")
+		}, 5000)
+	}
+
 	const addPerson = async (newPerson) => {
 		const indexPersonExist = persons.findIndex(
 			(person) => person.name === newPerson.name
@@ -55,24 +67,21 @@ export default function App() {
 							`Information of ${newPerson.name} has already been removed from server`
 						)
 						setTimeout(() => {
-							setNotify("Thanks")
+							setNotify("")
 						}, 5000)
 					})
-			} else {
-				await servicePersons.create(person).then((returnedPerson) => {
-					setPersons([...persons, returnedPerson])
-				})
 			}
 		} else {
-			await servicePersons.create(person).then((returnedPerson) => {
-				setPersons([...persons, returnedPerson])
-			})
+			await servicePersons
+				.create(person)
+				.then((returnedPerson) => {
+					setPersons([...persons, returnedPerson])
+					showNotify()
+				})
+				.catch((error) => {
+					showNotify(error.response.data)
+				})
 		}
-		setPerson({ name: "", phone: "" })
-		setNotify(`Added ${newPerson.name}`)
-		setTimeout(() => {
-			setNotify("")
-		}, 5000)
 	}
 
 	const onSubmit = async (e) => {

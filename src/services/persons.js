@@ -1,7 +1,7 @@
 import axios from "axios"
 
-// const baseUrl = "http://localhost:3001/api/persons"
-const baseUrl = process.env.REACT_APP_BASE_URL
+// const baseUrl = process.env.REACT_APP_BASE_URL
+const baseUrl = "http://localhost:3001/api/persons"
 console.log(baseUrl)
 
 const getAll = () => {
@@ -9,7 +9,7 @@ const getAll = () => {
 }
 
 const create = (newPerson) => {
-	return axios.post(baseUrl, newPerson).then((res) => res.data.pop())
+	return axios.post(baseUrl, newPerson).then((res) => res.data)
 }
 
 const update = (id, newPerson) => {
