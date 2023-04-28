@@ -39,8 +39,9 @@ export default function App() {
 				)
 			) {
 				await servicePersons
-					.update(indexPersonExist + 1, person)
+					.update(persons[indexPersonExist]._id, person)
 					.then((returnedPerson) => {
+						console.log(returnedPerson)
 						setPersons((prevPersons) =>
 							prevPersons.map((person) =>
 								returnedPerson.name === person.name
@@ -77,8 +78,6 @@ export default function App() {
 	const onSubmit = async (e) => {
 		e.preventDefault()
 		await addPerson(person)
-		// const returnedPerson = await servicePersons.create(person)
-		// setPersons([...persons, returnedPerson])
 	}
 
 	const handleDelete = (id) => {
